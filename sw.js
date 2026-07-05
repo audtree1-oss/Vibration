@@ -1,5 +1,5 @@
 // Resonance service worker — cache-first so the app works offline.
-const CACHE = 'resonance-v3';
+const CACHE = 'resonance-v4';
 const ASSETS = [
   './',
   './index.html',

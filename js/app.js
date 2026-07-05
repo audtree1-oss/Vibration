@@ -41,6 +41,7 @@
     if (parts[0] === 'translate') return renderTranslator();
     if (parts[0] === 'check') return renderCheck(parts[1] === 'retune');
     if (parts[0] === 'field-guide') return renderFieldGuide();
+    if (parts[0] === 'tuning') return renderTuningRoom();
     if (parts[0] === 'state' && parts[1]) {
       const state = STATES.find((s) => s.id === parts[1]);
       if (state) return renderStateScreen(state);
@@ -50,23 +51,14 @@
       const practice = state && state.practices.find((p) => p.id === parts[2]);
       if (state && practice) return renderPracticeIntro(state, practice);
     }
-    renderHome();
+    renderThreshold();
   }
 
   window.addEventListener('hashchange', route);
 
   // ---------- Screens ----------
 
-  function renderHome() {
-    const cards = STATES.map(
-      (s) => `
-      <a class="state-card" href="#/state/${s.id}" style="--hue:${s.hue}">
-        <span class="state-glyph" aria-hidden="true">${s.glyph}</span>
-        <span class="state-name">${s.name}</span>
-        <span class="state-tagline">${s.tagline}</span>
-      </a>`
-    ).join('');
-
+  function renderThreshold() {
     const todays = Store.todaysCheck();
     const todaysSignal = todays && SIGNALS.find((s) => s.id === todays.signalId);
     const checkBanner = todaysSignal
@@ -82,29 +74,60 @@
          </a>`;
 
     screenEl.innerHTML = `
-      <section class="home">
-        <h1 class="home-title">What state are you in?</h1>
-        <p class="home-sub">No wrong answers. States aren’t grades — they’re weather.</p>
+      <section class="threshold">
+        <div class="threshold-head">
+          <h1 class="threshold-title">Resonance</h1>
+          <p class="threshold-philosophy">You are not broken. You are responsive.<br>And because you are responsive, you can be gently retuned.</p>
+        </div>
         ${checkBanner}
-        <div class="state-grid">${cards}</div>
-        <div class="home-rooms">
-          <a class="room-link" href="#/library">
-            <span class="room-link-glyph" aria-hidden="true">◎</span>
-            <span class="room-link-name">The Frequency Library</span>
-            <span class="room-link-sub">real phenomena, poetic &amp; scientific</span>
+        <div class="doors">
+          <a class="door" href="#/tuning" style="--hue:262">
+            <span class="door-glyph" aria-hidden="true">✳</span>
+            <span class="door-name">The Tuning Room</span>
+            <span class="door-sub">what state are you in? pick it, tune it</span>
           </a>
-          <a class="room-link" href="#/translate">
-            <span class="room-link-glyph" aria-hidden="true">⇄</span>
-            <span class="room-link-name">The Vibe Translator</span>
-            <span class="room-link-sub">mystical in, grounded out</span>
+          <a class="door" href="#/check" style="--hue:200">
+            <span class="door-glyph" aria-hidden="true">◌</span>
+            <span class="door-name">Daily Resonance Check</span>
+            <span class="door-sub">what signal are you carrying today?</span>
           </a>
-          <a class="room-link" href="#/field-guide">
-            <span class="room-link-glyph" aria-hidden="true">✎</span>
-            <span class="room-link-name">The Field Guide</span>
-            <span class="room-link-sub">write the sentence under the sentence</span>
+          <a class="door" href="#/library" style="--hue:160">
+            <span class="door-glyph" aria-hidden="true">◎</span>
+            <span class="door-name">The Frequency Library</span>
+            <span class="door-sub">real phenomena, poetic &amp; scientific</span>
+          </a>
+          <a class="door" href="#/translate" style="--hue:322">
+            <span class="door-glyph" aria-hidden="true">⇄</span>
+            <span class="door-name">The Vibe Translator</span>
+            <span class="door-sub">mystical in, grounded out</span>
+          </a>
+          <a class="door" href="#/field-guide" style="--hue:45">
+            <span class="door-glyph" aria-hidden="true">✎</span>
+            <span class="door-name">The Field Guide</span>
+            <span class="door-sub">write the sentence under the sentence</span>
           </a>
         </div>
-        <p class="home-philosophy">You are not broken. You are responsive.<br>And because you are responsive, you can be gently retuned.</p>
+        <a class="threshold-about" href="#/about">what we mean · what we don’t</a>
+      </section>`;
+  }
+
+  function renderTuningRoom() {
+    const cards = STATES.map(
+      (s) => `
+      <a class="state-card" href="#/state/${s.id}" style="--hue:${s.hue}">
+        <span class="state-glyph" aria-hidden="true">${s.glyph}</span>
+        <span class="state-name">${s.name}</span>
+        <span class="state-tagline">${s.tagline}</span>
+      </a>`
+    ).join('');
+
+    screenEl.innerHTML = `
+      <section class="home">
+        <a class="back-link" href="#/">← the threshold</a>
+        <h1 class="home-title">What state are you in?</h1>
+        <p class="home-sub">No wrong answers. States aren’t grades — they’re weather.</p>
+        <div class="state-grid">${cards}</div>
+        <p class="home-philosophy">Everything responds to input.<br>So choose the input with care.</p>
       </section>`;
   }
 
@@ -124,7 +147,7 @@
 
     screenEl.innerHTML = `
       <section class="library">
-        <a class="back-link" href="#/">← the tuning room</a>
+        <a class="back-link" href="#/">← the threshold</a>
         <h1 class="library-title">The Frequency Library</h1>
         <p class="library-sub">Real phenomena only. Each one told twice — once for the soul, once for the receipts.</p>
         <div class="library-list">${cards}</div>
@@ -168,7 +191,7 @@
 
     screenEl.innerHTML = `
       <section class="translator">
-        <a class="back-link" href="#/">← the tuning room</a>
+        <a class="back-link" href="#/">← the threshold</a>
         <h1 class="translator-title">The Vibe Translator</h1>
         <p class="translator-sub">Say it however it comes out. We’ll find what it’s saying underneath.</p>
         <div class="translator-input-wrap">
@@ -231,7 +254,7 @@
 
     screenEl.innerHTML = `
       <section class="state-screen" style="--hue:${state.hue}">
-        <a class="back-link" href="#/">← the tuning room</a>
+        <a class="back-link" href="#/tuning">← the tuning room</a>
         <div class="state-header">
           <span class="state-glyph big" aria-hidden="true">${state.glyph}</span>
           <h1 class="state-title">${state.name}</h1>
@@ -244,7 +267,7 @@
   function renderPracticeIntro(state, practice) {
     screenEl.innerHTML = `
       <section class="intro" style="--hue:${state.hue}">
-        <a class="back-link" href="#/">← the tuning room</a>
+        <a class="back-link" href="#/tuning">← the tuning room</a>
         <div class="intro-body">
           <p class="intro-state">${state.glyph} &nbsp;${state.name}</p>
           <h1 class="intro-title">${practice.title}</h1>
@@ -272,7 +295,7 @@
 
     screenEl.innerHTML = `
       <section class="about">
-        <a class="back-link" href="#/">← the tuning room</a>
+        <a class="back-link" href="#/">← the threshold</a>
         <h1 class="about-title">${ABOUT.title}</h1>
         <p class="about-intro">${ABOUT.intro}</p>
         <div class="pairs">${pairs}</div>
@@ -326,7 +349,7 @@
 
     screenEl.innerHTML = `
       <section class="check">
-        <a class="back-link" href="#/">← the tuning room</a>
+        <a class="back-link" href="#/">← the threshold</a>
         <h1 class="check-title">What kind of signal are you carrying today?</h1>
         <p class="check-sub">Weather, not grades. Missed days are just quiet sky.</p>
         <div class="signal-grid">${cards}</div>
@@ -346,7 +369,7 @@
     const state = STATES.find((s) => s.id === signal.stateId);
     screenEl.innerHTML = `
       <section class="check-reading" style="--hue:${signal.hue}">
-        <a class="back-link" href="#/">← the tuning room</a>
+        <a class="back-link" href="#/">← the threshold</a>
         <div class="reading-card">
           <span class="signal-glyph big" aria-hidden="true">${signal.glyph}</span>
           <h1 class="reading-name">${signal.name}</h1>
@@ -385,7 +408,7 @@
 
     screenEl.innerHTML = `
       <section class="fieldguide">
-        <a class="back-link" href="#/">← the tuning room</a>
+        <a class="back-link" href="#/">← the threshold</a>
         <h1 class="fieldguide-title">The Field Guide</h1>
         <p class="fieldguide-sub">Notes from the field — the field being you.</p>
         <div class="prompt-card">
@@ -488,7 +511,7 @@
         <section class="player" style="--hue:${this.state.hue}">
           <div class="player-top">
             <span class="player-title">${this.practice.title}</span>
-            <a class="player-exit" href="#/" aria-label="Leave practice">✕</a>
+            <a class="player-exit" href="#/tuning" aria-label="Leave practice">✕</a>
           </div>
           <div class="player-stage" id="stage"></div>
           <div class="player-bottom">
@@ -596,7 +619,7 @@
             <button class="signal-btn" data-answer="louder">louder</button>
           </div>
           <p class="signal-response" id="signal-response"></p>
-          <a class="return-btn" href="#/">return to the room</a>
+          <a class="return-btn" href="#/tuning">return to the room</a>
         </section>`;
 
       const responses = {
