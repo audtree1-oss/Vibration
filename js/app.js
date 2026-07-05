@@ -33,6 +33,12 @@
     const parts = hash.split('/').filter(Boolean);
 
     if (parts[0] === 'about') return renderAbout();
+    if (parts[0] === 'library' && parts[1]) {
+      const entry = LIBRARY.find((e) => e.id === parts[1]);
+      if (entry) return renderLibraryEntry(entry);
+    }
+    if (parts[0] === 'library') return renderLibrary();
+    if (parts[0] === 'translate') return renderTranslator();
     if (parts[0] === 'state' && parts[1]) {
       const state = STATES.find((s) => s.id === parts[1]);
       if (state) return renderStateScreen(state);
@@ -64,8 +70,127 @@
         <h1 class="home-title">What state are you in?</h1>
         <p class="home-sub">No wrong answers. States aren’t grades — they’re weather.</p>
         <div class="state-grid">${cards}</div>
+        <div class="home-rooms">
+          <a class="room-link" href="#/library">
+            <span class="room-link-glyph" aria-hidden="true">◎</span>
+            <span class="room-link-name">The Frequency Library</span>
+            <span class="room-link-sub">real phenomena, poetic &amp; scientific</span>
+          </a>
+          <a class="room-link" href="#/translate">
+            <span class="room-link-glyph" aria-hidden="true">⇄</span>
+            <span class="room-link-name">The Vibe Translator</span>
+            <span class="room-link-sub">mystical in, grounded out</span>
+          </a>
+        </div>
         <p class="home-philosophy">You are not broken. You are responsive.<br>And because you are responsive, you can be gently retuned.</p>
       </section>`;
+  }
+
+  // ---------- Frequency Library ----------
+
+  function renderLibrary() {
+    const cards = LIBRARY.map(
+      (e) => `
+      <a class="library-card" href="#/library/${e.id}" style="--hue:${e.hue}">
+        <span class="library-glyph" aria-hidden="true">${e.glyph}</span>
+        <span class="library-card-text">
+          <span class="library-card-title">${e.title}</span>
+          <span class="library-card-hook">${e.hook}</span>
+        </span>
+      </a>`
+    ).join('');
+
+    screenEl.innerHTML = `
+      <section class="library">
+        <a class="back-link" href="#/">← the tuning room</a>
+        <h1 class="library-title">The Frequency Library</h1>
+        <p class="library-sub">Real phenomena only. Each one told twice — once for the soul, once for the receipts.</p>
+        <div class="library-list">${cards}</div>
+      </section>`;
+  }
+
+  function renderLibraryEntry(entry) {
+    const related = entry.related
+      ? `<a class="related-link" href="#/practice/${entry.related.stateId}/${entry.related.practiceId}">${entry.related.label} →</a>`
+      : '';
+
+    screenEl.innerHTML = `
+      <section class="entry" style="--hue:${entry.hue}">
+        <a class="back-link" href="#/library">← the library</a>
+        <div class="entry-header">
+          <span class="library-glyph big" aria-hidden="true">${entry.glyph}</span>
+          <h1 class="entry-title">${entry.title}</h1>
+        </div>
+        <div class="entry-layer">
+          <span class="layer-label poetic-label">poetic truth</span>
+          <p class="entry-poetic">${entry.poetic}</p>
+        </div>
+        <div class="entry-layer boxed">
+          <span class="layer-label science-layer-label">scientific truth</span>
+          <p class="entry-science">${entry.science}</p>
+        </div>
+        <div class="entry-layer boxed try">
+          <span class="layer-label try-label">try it now</span>
+          <p class="entry-try">${entry.tryIt}</p>
+          ${related}
+        </div>
+      </section>`;
+  }
+
+  // ---------- Vibe Translator ----------
+
+  function renderTranslator() {
+    const chips = TRANSLATOR.examples.map(
+      (t) => `<button class="example-chip" data-phrase="${t.replace(/"/g, '&quot;')}">${t}</button>`
+    ).join('');
+
+    screenEl.innerHTML = `
+      <section class="translator">
+        <a class="back-link" href="#/">← the tuning room</a>
+        <h1 class="translator-title">The Vibe Translator</h1>
+        <p class="translator-sub">Say it however it comes out. We’ll find what it’s saying underneath.</p>
+        <div class="translator-input-wrap">
+          <textarea id="vibe-input" class="vibe-input" rows="2" placeholder="e.g. I need to raise my vibration…" aria-label="Phrase to translate"></textarea>
+          <button id="translate-btn" class="translate-btn">translate</button>
+        </div>
+        <div class="example-chips">${chips}</div>
+        <div id="translation" class="translation" hidden>
+          <span class="layer-label translation-label">the translation</span>
+          <p id="translation-text" class="translation-text"></p>
+          <div id="translation-state"></div>
+          <p class="translation-outro">${TRANSLATOR.outro}</p>
+        </div>
+      </section>`;
+
+    const input = document.getElementById('vibe-input');
+    const resultBox = document.getElementById('translation');
+    const resultText = document.getElementById('translation-text');
+    const resultState = document.getElementById('translation-state');
+
+    function runTranslation() {
+      const phrase = input.value.trim();
+      if (!phrase) return;
+      const result = TRANSLATOR.translate(phrase);
+      resultText.textContent = result.text;
+      const state = result.state && STATES.find((s) => s.id === result.state);
+      resultState.innerHTML = state
+        ? `<a class="state-pointer" href="#/state/${state.id}" style="--hue:${state.hue}">
+             sounds a little like <em>${state.name}</em> — want to tune it? →</a>`
+        : '';
+      resultBox.hidden = false;
+      resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    document.getElementById('translate-btn').addEventListener('click', runTranslation);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); runTranslation(); }
+    });
+    screenEl.querySelectorAll('.example-chip').forEach((chip) => {
+      chip.addEventListener('click', () => {
+        input.value = chip.dataset.phrase;
+        runTranslation();
+      });
+    });
   }
 
   function renderStateScreen(state) {

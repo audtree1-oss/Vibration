@@ -22,7 +22,15 @@ weird" — and get a 1–5 minute guided practice with a breathing orb, gentle
 synthesized sound (brown noise, low drones, breath-pacing tones — all generated
 live, no audio files), and a science note at the end.
 
-Also included: **What We Mean / What We Don't Mean** — the built-in bullshit filter.
+Also included:
+
+- **The Frequency Library** — real phenomena (resonance, entrainment, HRV,
+  circadian rhythm, why humming feels holy, why silence feels loud...), each
+  told three ways: poetic truth / scientific truth / try it now
+- **The Vibe Translator** — type something mystical ("I need to raise my
+  vibration") and get it translated into grounded nervous-system language,
+  entirely on-device
+- **What We Mean / What We Don't Mean** — the built-in bullshit filter
 
 ## Running it
 
@@ -43,6 +51,8 @@ as an app (works offline).
 index.html            app shell
 css/style.css         celestial dark theme
 js/practices.js       states + practices content (edit this to add practices)
+js/library.js         Frequency Library entries (poetic/science/try-it)
+js/translator.js      Vibe Translator lexicon + matcher
 js/audio.js           Web Audio engine (noise, drone, breath swell, chime)
 js/app.js             router, screens, practice player, starfield
 sw.js                 offline cache
@@ -54,10 +64,7 @@ manifest.webmanifest  PWA install metadata
 - **Daily Resonance Check** — "What kind of signal are you carrying today?"
   (Static, Ember, Fog, Current, Stone, Spark, River, Bell, Storm, Moonwater)
   with on-device history
-- **Frequency Library** — real phenomena (resonance, entrainment, HRV, circadian
-  rhythm, why humming feels holy), each with poetic truth / scientific truth / try it now
 - **Field Guide** — journaling prompts ("Where is the static living in your body?")
-- **Vibe Translator** — mystical language in, grounded language out
 
 ## Philosophy
 
