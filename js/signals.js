@@ -1,0 +1,111 @@
+// The Daily Resonance Check — ten kinds of signal you might be carrying.
+// Not moods to grade, weather to notice. Each maps to a Tuning Room practice.
+//
+//   { id, name, glyph, hue, sense, reading, stateId, practiceId }
+//
+// `sense` is the card's one-line sensory description.
+// `reading` is shown after check-in: poetic recognition + one honest line
+// about what this signal tends to need. Never a diagnosis, never a grade.
+
+const SIGNALS = [
+  {
+    id: 'static',
+    name: 'Static',
+    glyph: '▒',
+    hue: 320,
+    sense: 'crackle with no station',
+    reading: 'The signal today is crackle — lots of charge, no clear station. Nothing is wrong with the radio. Static usually wants fewer inputs, dimmer light, and one long exhale at a time.',
+    stateId: 'overstimulated',
+    practiceId: 'lower-the-signal',
+  },
+  {
+    id: 'ember',
+    name: 'Ember',
+    glyph: '✴',
+    hue: 25,
+    sense: 'warm, low, waiting for air',
+    reading: 'You’re carrying an ember — alive, warm, but banked low. Embers aren’t failures of fire; they’re how fire rests. A little air, a little light, one small task, and it feeds itself.',
+    stateId: 'low-energy',
+    practiceId: 'kindle',
+  },
+  {
+    id: 'fog',
+    name: 'Fog',
+    glyph: '≋',
+    hue: 210,
+    sense: 'everything soft-edged and far',
+    reading: 'Fog today — thoughts soft-edged, the world slightly far away. Fog isn’t emptiness; it’s a landscape waiting for contrast. It tends to lift with one anchor: a single point of focus, feet on the floor, one thing at a time.',
+    stateId: 'scattered',
+    practiceId: 'gather-the-signal',
+  },
+  {
+    id: 'current',
+    name: 'Current',
+    glyph: '↯',
+    hue: 160,
+    sense: 'charge looking for a wire',
+    reading: 'There’s current in you today — real voltage looking for a wire. Unspent charge turns to jitter if it just sits. It usually wants motion first, rhythm second, and only then stillness.',
+    stateId: 'restless',
+    practiceId: 'give-it-somewhere-to-go',
+  },
+  {
+    id: 'stone',
+    name: 'Stone',
+    glyph: '⬤',
+    hue: 252,
+    sense: 'dense, slow, planeted',
+    reading: 'Stone today — dense, slow, more gravity than usual. Stone isn’t stuck; stone is *held*. This signal tends to soften with support: let the ground do the carrying for a few minutes before asking anything of yourself.',
+    stateId: 'heavy',
+    practiceId: 'let-the-ground-hold-it',
+  },
+  {
+    id: 'spark',
+    name: 'Spark',
+    glyph: '✧',
+    hue: 275,
+    sense: 'flint struck, nothing catching',
+    reading: 'Spark — flint struck, bright flashes, nothing quite catching. The ideas are real; the kindling is damp. Sparks usually catch when you stop striking harder and change the weather instead.',
+    stateId: 'blocked',
+    practiceId: 'change-the-weather',
+  },
+  {
+    id: 'river',
+    name: 'River',
+    glyph: '∽',
+    hue: 190,
+    sense: 'moving water, close to the surface',
+    reading: 'River today — feelings moving, close under the surface, easily stirred. A river isn’t a flood. This signal mostly wants gentle handling and somewhere safe to flow, not a dam.',
+    stateId: 'tender',
+    practiceId: 'hand-on-the-hull',
+  },
+  {
+    id: 'bell',
+    name: 'Bell',
+    glyph: '◎',
+    hue: 48,
+    sense: 'struck by something, still ringing',
+    reading: 'Bell — something struck you, and you’re still ringing with it. You don’t have to name the thing yet. Ringing fades fastest when you listen to it honestly instead of grabbing the bell.',
+    stateId: 'weird',
+    practiceId: 'take-a-reading',
+  },
+  {
+    id: 'storm',
+    name: 'Storm',
+    glyph: '⌁',
+    hue: 355,
+    sense: 'pressure building, air electric',
+    reading: 'Storm signal — pressure high, air electric, something wants to break loose. Storms are weather, not character flaws. They pass cleanest when the charge gets somewhere real to ground.',
+    stateId: 'angry',
+    practiceId: 'burn-clean',
+  },
+  {
+    id: 'moonwater',
+    name: 'Moonwater',
+    glyph: '☾',
+    hue: 225,
+    sense: 'quiet, deep, lit from far away',
+    reading: 'Moonwater — quiet and deep tonight, lit from somewhere far away. This is the signal of missing, remembering, honoring. It doesn’t need fixing. It needs room, breath, and maybe a name spoken softly.',
+    stateId: 'grief-static',
+    practiceId: 'let-it-move-through',
+  },
+];

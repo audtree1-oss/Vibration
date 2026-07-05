@@ -39,6 +39,8 @@
     }
     if (parts[0] === 'library') return renderLibrary();
     if (parts[0] === 'translate') return renderTranslator();
+    if (parts[0] === 'check') return renderCheck(parts[1] === 'retune');
+    if (parts[0] === 'field-guide') return renderFieldGuide();
     if (parts[0] === 'state' && parts[1]) {
       const state = STATES.find((s) => s.id === parts[1]);
       if (state) return renderStateScreen(state);
@@ -65,10 +67,25 @@
       </a>`
     ).join('');
 
+    const todays = Store.todaysCheck();
+    const todaysSignal = todays && SIGNALS.find((s) => s.id === todays.signalId);
+    const checkBanner = todaysSignal
+      ? `<a class="check-banner" href="#/check" style="--hue:${todaysSignal.hue}">
+           <span class="check-banner-glyph" aria-hidden="true">${todaysSignal.glyph}</span>
+           <span>today’s signal: <em>${todaysSignal.name}</em></span>
+           <span class="check-banner-arrow">→</span>
+         </a>`
+      : `<a class="check-banner" href="#/check">
+           <span class="check-banner-glyph" aria-hidden="true">◌</span>
+           <span>What kind of signal are you carrying today?</span>
+           <span class="check-banner-arrow">→</span>
+         </a>`;
+
     screenEl.innerHTML = `
       <section class="home">
         <h1 class="home-title">What state are you in?</h1>
         <p class="home-sub">No wrong answers. States aren’t grades — they’re weather.</p>
+        ${checkBanner}
         <div class="state-grid">${cards}</div>
         <div class="home-rooms">
           <a class="room-link" href="#/library">
@@ -80,6 +97,11 @@
             <span class="room-link-glyph" aria-hidden="true">⇄</span>
             <span class="room-link-name">The Vibe Translator</span>
             <span class="room-link-sub">mystical in, grounded out</span>
+          </a>
+          <a class="room-link" href="#/field-guide">
+            <span class="room-link-glyph" aria-hidden="true">✎</span>
+            <span class="room-link-name">The Field Guide</span>
+            <span class="room-link-sub">write the sentence under the sentence</span>
           </a>
         </div>
         <p class="home-philosophy">You are not broken. You are responsive.<br>And because you are responsive, you can be gently retuned.</p>
@@ -259,6 +281,172 @@
         </div>
         <p class="about-thesis">${ABOUT.thesis}</p>
       </section>`;
+  }
+
+  // ---------- Daily Resonance Check ----------
+
+  function weatherStrip() {
+    const checks = Store.loadChecks();
+    const byDate = Object.fromEntries(checks.map((c) => [c.date, c.signalId]));
+    const days = [];
+    for (let i = 13; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const pad = (n) => String(n).padStart(2, '0');
+      const key = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+      const signal = byDate[key] && SIGNALS.find((s) => s.id === byDate[key]);
+      days.push(
+        signal
+          ? `<span class="weather-day" style="--hue:${signal.hue}" title="${key}: ${signal.name}">${signal.glyph}</span>`
+          : `<span class="weather-day empty" title="${key}">·</span>`
+      );
+    }
+    return `
+      <div class="weather">
+        <span class="weather-label">your recent weather</span>
+        <div class="weather-strip">${days.join('')}</div>
+      </div>`;
+  }
+
+  function renderCheck(retune) {
+    const todays = Store.todaysCheck();
+    if (todays && !retune) {
+      const signal = SIGNALS.find((s) => s.id === todays.signalId);
+      if (signal) return renderCheckReading(signal, true);
+    }
+
+    const cards = SIGNALS.map(
+      (s) => `
+      <button class="signal-card" data-signal="${s.id}" style="--hue:${s.hue}">
+        <span class="signal-glyph" aria-hidden="true">${s.glyph}</span>
+        <span class="signal-name">${s.name}</span>
+        <span class="signal-sense">${s.sense}</span>
+      </button>`
+    ).join('');
+
+    screenEl.innerHTML = `
+      <section class="check">
+        <a class="back-link" href="#/">← the tuning room</a>
+        <h1 class="check-title">What kind of signal are you carrying today?</h1>
+        <p class="check-sub">Weather, not grades. Missed days are just quiet sky.</p>
+        <div class="signal-grid">${cards}</div>
+        ${weatherStrip()}
+      </section>`;
+
+    screenEl.querySelectorAll('.signal-card').forEach((card) => {
+      card.addEventListener('click', () => {
+        const signal = SIGNALS.find((s) => s.id === card.dataset.signal);
+        Store.saveCheck(signal.id);
+        renderCheckReading(signal, false);
+      });
+    });
+  }
+
+  function renderCheckReading(signal, alreadyChecked) {
+    const state = STATES.find((s) => s.id === signal.stateId);
+    screenEl.innerHTML = `
+      <section class="check-reading" style="--hue:${signal.hue}">
+        <a class="back-link" href="#/">← the tuning room</a>
+        <div class="reading-card">
+          <span class="signal-glyph big" aria-hidden="true">${signal.glyph}</span>
+          <h1 class="reading-name">${signal.name}</h1>
+          <p class="reading-text">${signal.reading}</p>
+          ${state ? `<a class="state-pointer" href="#/practice/${signal.stateId}/${signal.practiceId}">tune it with <em>${state.name}</em> →</a>` : ''}
+        </div>
+        ${weatherStrip()}
+        <a class="retune-link" href="#/check/retune">${alreadyChecked ? 'actually, the signal changed — re-check' : 'pick a different signal'}</a>
+      </section>`;
+  }
+
+  // ---------- The Field Guide ----------
+
+  function renderFieldGuide() {
+    let prompt = FIELD_GUIDE.randomPrompt();
+
+    function entriesHTML() {
+      const entries = Store.loadEntries().slice().reverse();
+      if (!entries.length) {
+        return '<p class="no-entries">No readings yet. The first page of a field guide is always blank.</p>';
+      }
+      return entries.map((e) => {
+        const d = new Date(e.date);
+        const when = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
+        return `
+          <details class="journal-entry">
+            <summary>
+              <span class="entry-date">${when}</span>
+              <span class="entry-prompt">${e.prompt}</span>
+            </summary>
+            <p class="entry-text"></p>
+            <button class="entry-delete" data-id="${e.id}">delete</button>
+          </details>`;
+      }).join('');
+    }
+
+    screenEl.innerHTML = `
+      <section class="fieldguide">
+        <a class="back-link" href="#/">← the tuning room</a>
+        <h1 class="fieldguide-title">The Field Guide</h1>
+        <p class="fieldguide-sub">Notes from the field — the field being you.</p>
+        <div class="prompt-card">
+          <span class="layer-label prompt-label">today’s prompt</span>
+          <p class="prompt-text" id="prompt-text">${prompt}</p>
+          <button class="shuffle-btn" id="shuffle">another prompt ↻</button>
+        </div>
+        <textarea id="journal-input" class="vibe-input journal-input" rows="5" placeholder="Write what’s true. No one is grading the weather." aria-label="Journal entry"></textarea>
+        <div class="journal-actions">
+          <span class="privacy-note">Entries live only on this device.</span>
+          <button class="translate-btn" id="save-entry">save</button>
+        </div>
+        <h2 class="entries-title">past readings</h2>
+        <div id="entries">${entriesHTML()}</div>
+      </section>`;
+
+    const input = document.getElementById('journal-input');
+    const entriesBox = document.getElementById('entries');
+
+    // Entry text is user-written — always set it as text, never as HTML.
+    function fillEntryTexts() {
+      const entries = Store.loadEntries().slice().reverse();
+      entriesBox.querySelectorAll('.journal-entry').forEach((el, i) => {
+        el.querySelector('.entry-text').textContent = entries[i] ? entries[i].text : '';
+      });
+    }
+
+    function bindDeletes() {
+      entriesBox.querySelectorAll('.entry-delete').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (btn.dataset.armed) {
+            Store.deleteEntry(btn.dataset.id);
+            entriesBox.innerHTML = entriesHTML();
+            fillEntryTexts();
+            bindDeletes();
+          } else {
+            btn.dataset.armed = '1';
+            btn.textContent = 'tap again to really delete';
+          }
+        });
+      });
+    }
+    fillEntryTexts();
+    bindDeletes();
+
+    document.getElementById('shuffle').addEventListener('click', () => {
+      prompt = FIELD_GUIDE.randomPrompt(prompt);
+      document.getElementById('prompt-text').textContent = prompt;
+    });
+
+    document.getElementById('save-entry').addEventListener('click', () => {
+      const text = input.value.trim();
+      if (!text) return;
+      Store.saveEntry(prompt, text);
+      input.value = '';
+      entriesBox.innerHTML = entriesHTML();
+      fillEntryTexts();
+      bindDeletes();
+      AudioEngine.unlock();
+      AudioEngine.chime();
+    });
   }
 
   // ---------- Practice player ----------

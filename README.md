@@ -24,6 +24,12 @@ live, no audio files), and a science note at the end.
 
 Also included:
 
+- **The Daily Resonance Check** — "What kind of signal are you carrying
+  today?" Ten sensory signals (Static, Ember, Fog, Current, Stone, Spark,
+  River, Bell, Storm, Moonwater), each with a reading and a matching practice,
+  plus a "recent weather" strip. No streaks, no guilt — missed days are quiet sky.
+- **The Field Guide** — journaling with rotating prompts ("Where is the static
+  living in your body?"). Entries are stored only on your device.
 - **The Frequency Library** — real phenomena (resonance, entrainment, HRV,
   circadian rhythm, why humming feels holy, why silence feels loud...), each
   told three ways: poetic truth / scientific truth / try it now
@@ -53,18 +59,25 @@ css/style.css         celestial dark theme
 js/practices.js       states + practices content (edit this to add practices)
 js/library.js         Frequency Library entries (poetic/science/try-it)
 js/translator.js      Vibe Translator lexicon + matcher
+js/signals.js         Daily Resonance Check signals + readings
+js/fieldguide.js      Field Guide prompts + on-device storage helpers
 js/audio.js           Web Audio engine (noise, drone, breath swell, chime)
 js/app.js             router, screens, practice player, starfield
 sw.js                 offline cache
 manifest.webmanifest  PWA install metadata
 ```
 
+## Privacy
+
+Check-in history and journal entries are stored in the browser's
+`localStorage` on your device. Nothing is sent anywhere. Deleting an entry
+really deletes it.
+
 ## Roadmap
 
-- **Daily Resonance Check** — "What kind of signal are you carrying today?"
-  (Static, Ember, Fog, Current, Stone, Spark, River, Bell, Storm, Moonwater)
-  with on-device history
-- **Field Guide** — journaling prompts ("Where is the static living in your body?")
+The original feature set is complete. Ideas for later: gentle reminders,
+export/backup of journal entries, an AI-powered conversational Vibe
+Translator, more practices and library entries.
 
 ## Philosophy
 
